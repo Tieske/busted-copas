@@ -17,6 +17,13 @@ Spec files are named with a numeric prefix and a descriptive suffix: `NN-topic_s
 
 When adding tests, place them in the file that matches their scope. Only create a new file when the topic is clearly distinct from existing files.
 
+## MECE test cases
+
+Test cases within a `describe` block should be MECE: mutually exclusive, collectively exhaustive.
+
+- **Mutually exclusive**: each test exercises a distinct branch, for a distinct reason. If a new test would only restate an existing one under a different description, it's not a new case — cut the weaker of the two.
+- **Collectively exhaustive**: enumerate the branches the code under test actually has — each input case, each error path, each boundary — and confirm each one has a test. A gap here is a missing test, not a missing assertion inside an existing one. When full coverage is genuinely impractical (the case count explodes combinatorially, or a branch can't be exercised in isolation), don't skip it silently: check with the user first, and if they agree to leave it untested, document the reason — a comment at the branch, or a note in the spec file — the same way any other genuinely-not-applicable test is documented.
+
 ## Test isolation
 
 In Busted the test files are run as Lua files; all `describe` blocks execute at load time. All other blocks only run at test-runtime. Therefore:
