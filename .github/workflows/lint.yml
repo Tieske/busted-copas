@@ -1,0 +1,43 @@
+name: Lint
+
+concurrency:
+  # for PR's cancel the running task, if another commit is pushed
+  group: ${{ github.workflow }} ${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+on:
+  # build on PR and push-to-main. This works for short-lived branches, and saves
+  # CPU cycles on duplicated tests.
+  # For long-lived branches that diverge, you'll want to run on all pushes, not
+  # just on push-to-main.
+  pull_request: {}
+  push:
+    branches:
+    - main
+
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: luarocks/gh-actions-lua@85e2287697275df96334743ac654241a8fd34ab3 # master
+        with:
+          luaVersion: "5.4"
+
+      - uses: luarocks/gh-actions-luarocks@95d2308a0aff36ad31ebadca493ed14853399842 # master
+        with:
+          luaRocksVersion: "3.13.0"
+
+      - name: dependencies
+        run: |
+          make dev
+
+      - name: lint
+        run: |
+          make lint
