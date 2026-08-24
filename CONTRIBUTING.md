@@ -75,13 +75,9 @@ The type of your commit indicates what type of change this commit is about. The 
 
 Testing is done using the busted test framework, LuaCheck for linting, and LuaCov for coverage.
 
-Use `make test` and `make lint` to run the tests. Coverage information will be in the file `luacov.report.out`.
+Use `make test` and `make lint` to run the tests. Coverage information will be in the file `luacov.report.out`. (AI agents: see `spec/AGENTS.md` instead — running through the Makefile isn't the agent workflow.)
 
-**AI agents** should NOT use the makefile to test but directly use Busted as specified in `spec/AGENTS.md`.
-
-In this library we adhere to a rigorous standard of quality: every feature, function, or component added to the codebase is accompanied by comprehensive tests, where reasonable and applicable. This ensures reliability, maintainability, and robustness, and provides a safety net for future changes. Exceptions to this rule are documented and justified, so that our development process remains transparent.
-
-Be sensible, write tests, increase coverage.
+Every feature, fix, or behavioural change added to the codebase MUST be accompanied by tests. If a test is genuinely not applicable, document the reason, so exceptions stay transparent rather than silent.
 
 
 ## Documentation

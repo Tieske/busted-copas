@@ -7,9 +7,9 @@ This file covers conventions for the Busted test files in `./spec/`.
 Tests use [Busted](https://lunarmodules.github.io/busted/). Run them with `busted` from the repository root. Lint with `luacheck`.
 Coverage information will be in the file `luacov.report.out`.
 
-When running tests using `busted` ALWAYS specify `--output=utfTerminal` which generates less output than the default `gtest` handler. To save on tokens.
+When running tests, ALWAYS specify `--output=utfTerminal` — it produces far less output than the default `gtest` handler, saving tokens.
 
-The Makefile can be used (`make test` or `make lint`) once to ensure the proper test tools get installed. Again; to reduce output and save tokens AI agents should NOT use the Makefile for regular testing, that is for humans.
+Run `make dev` once, to install the test tooling. After that, AI agents should run `busted`/`luacheck` directly rather than through `make test`/`make lint` — the Makefile wraps them in extra output meant for humans, not agents.
 
 ## File layout
 
@@ -63,7 +63,7 @@ describe("some block", function()
 end)
 ```
 
-## exporting internal/private elements to facilitate testing
+## Exporting internals for testing
 
 Modules can export elements if the global _G._TEST flag is set. This makes it easier to
 test private functions, or validate internal state during testing.
@@ -88,7 +88,7 @@ return M
 
 ## Code style
 
-Style follows [.editorconfig](../.editorconfig), LF line endings) and [.luacheckrc](../.luacheckrc).
+Style follows [.editorconfig](../.editorconfig) (LF line endings) and [.luacheckrc](../.luacheckrc).
 
 ### General
 
