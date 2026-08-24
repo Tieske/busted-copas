@@ -2,12 +2,12 @@
 
 --- CLI application.
 -- Description goes here.
--- @script [module-name]
+-- @script busted-copas
 -- @usage
 -- # start the application from a shell
--- [module-name] --some --options=here
+-- busted-copas --some --options=here
 
-print("Welcome to the [module-name] CLI, echoing arguments:")
+print("Welcome to the busted-copas CLI, echoing arguments:")
 for i, val in ipairs(arg) do
   print(i .. ":", val)
 end

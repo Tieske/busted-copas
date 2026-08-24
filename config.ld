@@ -1,6 +1,6 @@
-project='[repo-name]'
-title='[module-name] docs'
-description='[short-description]'
+project='busted-copas'
+title='busted-copas docs'
+description='Test framework for testing async Copas applications, on top of Busted'
 
 format='markdown'
 use_markdown_titles = true

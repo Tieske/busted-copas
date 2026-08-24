@@ -1,8 +1,8 @@
-local package_name = "[module-name]"
+local package_name = "busted-copas"
 local package_version = "scm"
 local rockspec_revision = "1"
-local github_account_name = "[github-account-name]"
-local github_repo_name = "[repo-name]"
+local github_account_name = "Tieske"
+local github_repo_name = "busted-copas"
 
 
 package = package_name
@@ -15,9 +15,9 @@ source = {
 }
 
 description = {
-  summary = "[short-description]",
+  summary = "Test framework for testing async Copas applications, on top of Busted",
   detailed = [[
-    [short-description]
+    Test framework for testing async Copas applications, on top of Busted
   ]],
   license = "MIT",
   homepage = "https://github.com/"..github_account_name.."/"..github_repo_name,
@@ -31,17 +31,17 @@ build = {
   type = "builtin",
 
   modules = {
-    ["[module-name].init"] = "src/[module-name]/init.lua",
+    ["busted-copas.init"] = "src/busted-copas/init.lua",
   },
 
   install = {
     bin = {
-      ["[module-name]"] = "bin/[module-name].lua",
+      ["busted-copas"] = "bin/busted-copas.lua",
     }
   },
 
   copy_directories = {
-    -- can be accessed by `luarocks [module-name] doc` from the commandline
+    -- can be accessed by `luarocks busted-copas doc` from the commandline
     "docs",
   },
 }

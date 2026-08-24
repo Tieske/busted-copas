@@ -25,7 +25,7 @@ The context can be acquired from `doc_topics/` (to prevent duplication here). If
 | `spec/` | Tests (Busted); see [`spec/AGENTS.md`](spec/AGENTS.md) for test conventions |
 | `examples/` | Example scripts |
 | `doc_topics/` | user facing generic documentation about purpose, design etc. |
-| `bin/` | Commandline scripts, see [rockspec]([module-name]-scm-1.rockspec) |
+| `bin/` | Commandline scripts, see [rockspec](busted-copas-scm-1.rockspec) |
 | `.luacheckrc` | LuaCheck lint configuration (authoritative for lint) |
 | `.editorconfig` | Editor/formatting preferences |
 | `config.ld` | ldoc configuration for API docs |
@@ -39,7 +39,7 @@ For test file conventions, isolation rules, code style, and vertical whitespace 
 
 ## Lua compatibility
 
-All code MUST be compatible with the Lua versions specified in the [rockspec]([module-name]-scm-1.rockspec). This includes LuaJIT. Do not use features specific to a single Lua version without a compatibility shim.
+All code MUST be compatible with the Lua versions specified in the [rockspec](busted-copas-scm-1.rockspec). This includes LuaJIT. Do not use features specific to a single Lua version without a compatibility shim.
 
 ## Code style
 
