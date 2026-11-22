@@ -26,7 +26,7 @@ Every new feature, bug fix, or behavioural change MUST be accompanied by tests. 
 
 ## Lua compatibility
 
-All code MUST be compatible with the Lua versions specified in the [rockspec](busted-copas-scm-1.rockspec), including LuaJIT. Don't use version-specific features without a compatibility shim.
+All code MUST be compatible with the Lua versions specified in the [rockspec](busted-copas-scm-1.rockspec). Don't use version-specific features without a compatibility shim. Lua 5.1 and LuaJIT are explicitly out of scope — see [adr/0006](adr/0006-drop-lua51-and-luajit-support.md).
 
 ## Commits and code style
 
