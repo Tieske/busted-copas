@@ -48,7 +48,11 @@ local function dofile_error_handler(err)
 end
 
 copas.addthread(function()
-  local ok, err = xpcall(dofile, dofile_error_handler, busted_script)
+  -- busted_script is captured as an upvalue, not passed as an xpcall
+  -- argument: Lua 5.1's xpcall doesn't forward extra arguments to the
+  -- protected function (only Lua 5.2+ does) — passing it as an argument
+  -- would silently call dofile() with none, which reads from stdin instead.
+  local ok, err = xpcall(function() return dofile(busted_script) end, dofile_error_handler)
 
   -- copas.loop() only returns once ALL scheduler activity clears: every
   -- addthread AND every addserver-registered listener. A single spec that
