@@ -74,27 +74,33 @@ describe("busted-copas.timeout()", function()
   end)
 
 
-  -- finally() only runs as part of busted's own teardown for the test that
-  -- registered it, once that test's `it()` body returns — not synchronously
-  -- while it's still running. So observing it needs two tests: this one
-  -- triggers the timeout and sets `cleaned_up` in its finally(); the next
-  -- one asserts it, relying on busted having already run that teardown by
-  -- the time it starts. This is a deliberate dependency between the two,
-  -- not an accident — there's no way to observe post-abandonment cleanup
-  -- synchronously from within the test that triggered it. The dependency is
-  -- safe here because busted runs `it()` blocks within a `describe` in
-  -- file order by default, and this project's .busted config doesn't set
-  -- `shuffle`; don't add `--shuffle` without re-checking this pair.
-  it("registers finally() before the call that ends up timing out", function()
-    assert.has_error(bc.timeout(0.1, function()
-      finally(function() cleaned_up = true end)
-      copas.pause(1) -- this is what times out
-    end))
-  end)
+
+  describe("finally() survives an abandoned test", function()
+
+    -- finally() only runs as part of busted's own teardown for the test that
+    -- registered it, once that test's `it()` body returns — not synchronously
+    -- while it's still running. So observing it needs two tests: this one
+    -- triggers the timeout and sets `cleaned_up` in its finally(); the next
+    -- one asserts it, relying on busted having already run that teardown by
+    -- the time it starts. This is a deliberate dependency between the two,
+    -- not an accident — there's no way to observe post-abandonment cleanup
+    -- synchronously from within the test that triggered it. The dependency is
+    -- safe here because busted runs `it()` blocks within a `describe` in
+    -- file order by default, and this project's .busted config doesn't set
+    -- `shuffle`; don't add `--shuffle` without re-checking this pair.
+
+    it("registers finally() before the call that ends up timing out", function()
+      assert.has_error(bc.timeout(0.1, function()
+        finally(function() cleaned_up = true end)
+        copas.pause(1) -- this is what times out
+      end))
+    end)
 
 
-  it("still ran that finally(), despite the timeout abandoning its test", function()
-    assert.is_true(cleaned_up)
+    it("still ran that finally(), despite the timeout abandoning its test", function()
+      assert.is_true(cleaned_up)
+    end)
+
   end)
 
 end)
