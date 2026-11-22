@@ -40,10 +40,11 @@ function M.wait(condition, timeout, interval)
   interval = interval or 0.05
   local deadline = copas.gettime() + timeout
   while not condition() do
-    if copas.gettime() >= deadline then
+    local remaining = deadline - copas.gettime()
+    if remaining <= 0 then
       error(("Timeout: condition not met within %.2f seconds"):format(timeout), 2)
     end
-    copas.pause(interval)
+    copas.pause(math.min(interval, remaining))
   end
 end
 
