@@ -1,8 +1,12 @@
 return {
   default = {
+    lua = "bin/busted-copas.lua",
     verbose = true,
     coverage = true,
     output = "gtest",
     lazy = true,
+    -- spec/fixtures/ holds fixtures for spec/01-runner_spec.lua (including one
+    -- that is *meant* to fail); keep the default run from descending into it.
+    recursive = false,
   },
 }
