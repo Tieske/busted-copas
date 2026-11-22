@@ -86,17 +86,21 @@ function M.timeout(seconds, fn, msg)
   return function()
     local fut = future.addthread(fn)
 
+    local timed_out = false
     local t = timer.new({
       delay = seconds,
       recurring = false,
-      callback = function() fut:cancel() end,
+      callback = function()
+        timed_out = true
+        fut:cancel()
+      end,
     })
 
     local ok, err = fut:get()
     t:cancel()
 
     if not ok then
-      if err == "cancelled" then
+      if timed_out then
         error(msg, 2)
       end
       error(err, 2)
