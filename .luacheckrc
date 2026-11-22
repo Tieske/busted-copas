@@ -23,6 +23,10 @@ files["spec/**/*.lua"] = {
     std = "+busted",
 }
 
+files["examples/**/*.lua"] = {
+    std = "+busted",
+}
+
 exclude_files = {
     -- The Github Actions Lua Environment
     ".lua",
