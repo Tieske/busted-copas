@@ -10,32 +10,42 @@ local function run_busted(args)
 end
 
 
+local function assert_exit_code(expected, code, out)
+  -- surface the subprocess's own output on a mismatch; a bare exit-code
+  -- diff gives no clue which assertion/error inside it actually fired.
+  if code ~= expected then
+    io.stderr:write(out)
+  end
+  assert.equals(expected, code)
+end
+
+
 
 describe("busted-copas runner", function()
 
   it("exits 0 when all tests pass", function()
-    local code = run_busted("spec/fixtures/passing_spec.lua")
-    assert.equals(0, code)
+    local code, out = run_busted("spec/fixtures/passing_spec.lua")
+    assert_exit_code(0, code, out)
   end)
 
 
   it("exits 1 when a test fails", function()
-    local code = run_busted("spec/fixtures/failing_spec.lua")
-    assert.equals(1, code)
+    local code, out = run_busted("spec/fixtures/failing_spec.lua")
+    assert_exit_code(1, code, out)
   end)
 
 
   it("supports standard busted flags (e.g. --pattern)", function()
-    local code = run_busted("--pattern=passing spec/fixtures/")
-    assert.equals(0, code)
+    local code, out = run_busted("--pattern=passing spec/fixtures/")
+    assert_exit_code(0, code, out)
   end)
 
 
   it("exits cleanly even if a spec leaks a copas server", function()
     -- regression test for the copas.cancelall() call in bin/busted-copas;
     -- without it this invocation would hang instead of exiting.
-    local code = run_busted("spec/fixtures/leaky_server_spec.lua")
-    assert.equals(0, code)
+    local code, out = run_busted("spec/fixtures/leaky_server_spec.lua")
+    assert_exit_code(0, code, out)
   end)
 
 end)
