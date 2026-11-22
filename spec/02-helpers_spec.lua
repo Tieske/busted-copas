@@ -81,7 +81,10 @@ describe("busted-copas.timeout()", function()
   -- one asserts it, relying on busted having already run that teardown by
   -- the time it starts. This is a deliberate dependency between the two,
   -- not an accident — there's no way to observe post-abandonment cleanup
-  -- synchronously from within the test that triggered it.
+  -- synchronously from within the test that triggered it. The dependency is
+  -- safe here because busted runs `it()` blocks within a `describe` in
+  -- file order by default, and this project's .busted config doesn't set
+  -- `shuffle`; don't add `--shuffle` without re-checking this pair.
   it("registers finally() before the call that ends up timing out", function()
     assert.has_error(bc.timeout(0.1, function()
       finally(function() cleaned_up = true end)
