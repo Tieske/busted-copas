@@ -62,12 +62,18 @@ it("completes the handshake in time", bc.timeout(5, function()
 end))
 ```
 
-Composes directly with Busted's own `assert.has_error` for "fails within N
-seconds" assertions — no dedicated helper needed:
+Composes with Busted's own `assert.has_error` for "fails within N seconds"
+assertions — no dedicated helper needed — but `assert.has_error` must be
+*inside* the timed body, not wrapped around it. Wrapping it around
+`bc.timeout` would let the helper's own timeout error satisfy the
+assertion too, so an operation that just hangs (never raising the error
+it's supposed to) would make the test pass instead of fail:
 
 ```lua
-assert.has_error(bc.timeout(1, function()
-  -- ... something that should error ...
+it("fails within N seconds", bc.timeout(1, function()
+  assert.has_error(function()
+    -- ... something that should error ...
+  end)
 end))
 ```
 
