@@ -55,8 +55,9 @@ it never calls `it` itself:
 
 ```lua
 it("completes the handshake in time", bc.timeout(5, function()
-  local skt = assert(socket.connect(host, port))
+  local skt = assert(socket.tcp())
   finally(function() copas.close(skt) end)
+  assert(copas.connect(skt, host, port))
   local data = copas.receive(skt)
   assert.equals("hello", data)
 end))

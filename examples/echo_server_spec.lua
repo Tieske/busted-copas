@@ -28,8 +28,9 @@ describe("echo server", function()
 
 
   it("echoes a line back to the client", bc.timeout(5, function()
-    local client = copas.wrap(assert(socket.connect("127.0.0.1", PORT)))
+    local client = copas.wrap(assert(socket.tcp()))
     finally(function() copas.close(client) end)
+    assert(client:connect("127.0.0.1", PORT))
 
     client:send("hello\n")
     local received = client:receive("*l")
