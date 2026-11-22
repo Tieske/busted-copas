@@ -1,0 +1,126 @@
+# Timeouts
+
+## Two kinds of timeout
+
+**Operation timeout** — scoped to a single Copas call, and the preferred,
+most precise mechanism. Reach for a test timeout only for what this can't
+catch:
+
+```lua
+copas.settimeout(skt, seconds)
+local data, err = copas.receive(skt) -- returns nil, "timeout" on expiry
+```
+
+Locks and semaphores take an inline `timeout` argument directly instead:
+
+```lua
+lock:get(timeout)
+semaphore:take(n, timeout)
+```
+
+**Test timeout** — a whole-test safety net, `bc.timeout(seconds, fn)`, for
+catching gross hangs that per-operation timeouts wouldn't — for example a
+chain of many short waits that individually never expire but collectively
+hang.
+
+A test timeout means the test's coroutine is **abandoned**, not terminated:
+Lua coroutines can't be forcibly interrupted mid-yield, so no code after the
+point it was suspended ever runs, including any inline cleanup that isn't
+behind a `finally()` registered beforehand. See "Limitations" below.
+
+## Helper API
+
+`require "busted-copas"` gives you three functions. None of them are Busted
+DSL keywords — they're plain functions, callable from anywhere inside a spec
+file.
+
+**`bc.pause(seconds)`** — a plain re-export of `copas.pause`, so tests only
+need to `require` one module.
+
+**`bc.wait(condition, timeout, interval)`** — polls `condition()` every
+`interval` seconds (default `0.05`) until it returns truthy, raising an
+error if `timeout` seconds (default `5`) elapse first:
+
+```lua
+local result
+start_async_operation(function(r) result = r end)
+bc.wait(function() return result ~= nil end, 3)
+assert.equals("expected", result)
+```
+
+**`bc.timeout(seconds, fn, msg)`** — wraps `fn` so it fails if it doesn't
+complete within `seconds`, abandoning it otherwise. `bc.timeout` returns a
+*function*, meant to be handed to Busted's own `it()` as the test body —
+it never calls `it` itself:
+
+```lua
+it("completes the handshake in time", bc.timeout(5, function()
+  local skt = assert(socket.tcp())
+  finally(function() copas.close(skt) end)
+  assert(copas.connect(skt, host, port))
+  local data = copas.receive(skt)
+  assert.equals("hello", data)
+end))
+```
+
+Composes with Busted's own `assert.has_error` for "fails within N seconds"
+assertions — no dedicated helper needed — but `assert.has_error` must be
+*inside* the timed body, not wrapped around it. Wrapping it around
+`bc.timeout` would let the helper's own timeout error satisfy the
+assertion too, so an operation that just hangs (never raising the error
+it's supposed to) would make the test pass instead of fail:
+
+```lua
+it("fails within N seconds", bc.timeout(1, function()
+  assert.has_error(function()
+    -- ... something that should error ...
+  end)
+end))
+```
+
+### The `finally()`-ordering requirement
+
+Any resource `fn` acquires must be registered for cleanup via `finally()`
+**immediately**, before the operation that might be the one that times out.
+`finally()` runs in Busted's own still-alive coroutine regardless of whether
+`fn`'s coroutine ever resumes again, so registering early is what makes
+cleanup survive a timeout — the same acquire-then-immediately-register
+discipline a plain Busted test already needs (skip it, and an exception
+between acquisition and registration leaks the resource today, timeout or
+not).
+
+### Subtasks manage their own errors
+
+A background thread a test spawns with a bare `copas.addthread` (not wrapped
+in a `copas.future`) that errors independently goes to Copas's default error
+handler — it prints and vanishes, without failing the test. If a subtask's
+outcome matters to a test's correctness, the test should observe it
+explicitly: wrap it in its own `copas.future` and check the result, the same
+way `bc.timeout` observes its own future.
+
+## Limitations
+
+- **Coroutine abandonment**: a `bc.timeout` expiry stops the test's
+  coroutine from ever being resumed again. It does not run any code after
+  the point it was suspended, including inline cleanup that isn't behind a
+  `finally()` registered earlier. This is fundamental to how Lua coroutines
+  work, not specific to this library, but it's the single most important
+  thing to understand correctly.
+- **Stray background-thread errors aren't forwarded**: see "Subtasks manage
+  their own errors" above.
+- **`bc.wait`'s deadline is best-effort, not exact**: each poll sleeps for
+  at most the remaining time before the deadline, but `copas.pause` can
+  wake up slightly later than requested (never earlier) depending on the
+  scheduler's own tick granularity. A condition that flips true in that
+  small overshoot window can still be accepted. This is inherent to any
+  cooperative scheduler built on `select`/`poll` and isn't fixable by
+  reordering checks — only how large the overshoot can be is bounded, and
+  it's now capped at one scheduler tick rather than a full poll `interval`.
+- **Busted's re-exec arg quoting**: on every currently released Busted
+  version, arguments passed through the `lua`-interpreter re-exec are joined
+  unescaped — a spec path containing a space or shell metacharacter can
+  break the re-exec. This is a Busted-side issue, not something fixable
+  from this library.
+
+See the [echo server example](../examples/echo_server_spec.lua.html) for
+`bc.timeout` and `finally()` used together against real socket I/O.
