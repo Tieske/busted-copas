@@ -91,8 +91,7 @@ function M.timeout(seconds, fn, msg)
       delay = seconds,
       recurring = false,
       callback = function()
-        timed_out = true
-        fut:cancel()
+        timed_out = fut:cancel()
       end,
     })
 
