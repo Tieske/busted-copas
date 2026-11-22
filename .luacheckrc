@@ -32,5 +32,11 @@ exclude_files = {
     ".lua",
     ".luarocks",
     ".install",
+
+    -- Illustrative bad-pattern fixtures for the check-async-test-hygiene
+    -- skill; read by that skill, never run as part of the suite. Matched
+    -- without a fixed prefix since luacheck reaches the directory via its
+    -- `.claude/skills/` symlink, not only its real `.agents/skills/` path.
+    "**/check-async-test-hygiene/fixtures/**/*.lua",
 }
 

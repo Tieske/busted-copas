@@ -45,3 +45,7 @@ Default label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `read
 ### Domain docs
 
 Single-context: `CONTEXT.md` + `adr/`, both at the repo root — not under `docs/`, which is generated LDoc output. See `.agents/config/domain.md`.
+
+### Async test hygiene
+
+Reviews a Busted spec for two structural bugs a linter can't catch: a late `finally()`, or a `before_each`-opened socket/server with no matching `after_each`. A dev-time aid, not part of the rockspec — see the `check-async-test-hygiene` skill.
