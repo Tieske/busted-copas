@@ -33,7 +33,7 @@ M.pause = copas.pause
 -- @usage
 --   local result
 --   start_async_operation(function(r) result = r end)
---   cb.wait(function() return result ~= nil end, 3)
+--   bc.wait(function() return result ~= nil end, 3)
 --   assert.equals("expected", result)
 function M.wait(condition, timeout, interval)
   timeout  = timeout  or 5
@@ -56,7 +56,7 @@ end
 -- function raises an error.
 --
 -- Returns a *function*, meant to be handed to busted's own `it()` as the
--- test body — `cb.timeout` never calls `it` itself (see ADR 0004).
+-- test body — `bc.timeout` never calls `it` itself (see ADR 0004).
 --
 -- Any resource `fn` acquires must be registered for cleanup via busted's
 -- `finally()` *immediately*, before the operation that might be the one
@@ -73,7 +73,7 @@ end
 -- @tparam[opt] string msg  error message to use on timeout, replacing the
 --                          default "Test timed out after %.2f seconds"
 -- @usage
---   it("completes the handshake in time", cb.timeout(5, function()
+--   it("completes the handshake in time", bc.timeout(5, function()
 --     local skt = assert(socket.connect(host, port))
 --     finally(function() copas.close(skt) end)
 --     local data = copas.receive(skt)

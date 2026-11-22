@@ -3,7 +3,7 @@
 
 local copas  = require "copas"
 local socket = require "socket"
-local cb     = require "busted-copas"
+local bc     = require "busted-copas"
 
 local PORT = 19876
 
@@ -27,7 +27,7 @@ describe("echo server", function()
   end)
 
 
-  it("echoes a line back to the client", cb.timeout(5, function()
+  it("echoes a line back to the client", bc.timeout(5, function()
     local client = copas.wrap(assert(socket.connect("127.0.0.1", PORT)))
     finally(function() copas.close(client) end)
 

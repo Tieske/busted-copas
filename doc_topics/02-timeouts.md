@@ -18,7 +18,7 @@ lock:get(timeout)
 semaphore:take(n, timeout)
 ```
 
-**Test timeout** — a whole-test safety net, `cb.timeout(seconds, fn)`, for
+**Test timeout** — a whole-test safety net, `bc.timeout(seconds, fn)`, for
 catching gross hangs that per-operation timeouts wouldn't — for example a
 chain of many short waits that individually never expire but collectively
 hang.
@@ -34,27 +34,27 @@ behind a `finally()` registered beforehand. See "Limitations" below.
 DSL keywords — they're plain functions, callable from anywhere inside a spec
 file.
 
-**`cb.pause(seconds)`** — a plain re-export of `copas.pause`, so tests only
+**`bc.pause(seconds)`** — a plain re-export of `copas.pause`, so tests only
 need to `require` one module.
 
-**`cb.wait(condition, timeout, interval)`** — polls `condition()` every
+**`bc.wait(condition, timeout, interval)`** — polls `condition()` every
 `interval` seconds (default `0.05`) until it returns truthy, raising an
 error if `timeout` seconds (default `5`) elapse first:
 
 ```lua
 local result
 start_async_operation(function(r) result = r end)
-cb.wait(function() return result ~= nil end, 3)
+bc.wait(function() return result ~= nil end, 3)
 assert.equals("expected", result)
 ```
 
-**`cb.timeout(seconds, fn, msg)`** — wraps `fn` so it fails if it doesn't
-complete within `seconds`, abandoning it otherwise. `cb.timeout` returns a
+**`bc.timeout(seconds, fn, msg)`** — wraps `fn` so it fails if it doesn't
+complete within `seconds`, abandoning it otherwise. `bc.timeout` returns a
 *function*, meant to be handed to Busted's own `it()` as the test body —
 it never calls `it` itself:
 
 ```lua
-it("completes the handshake in time", cb.timeout(5, function()
+it("completes the handshake in time", bc.timeout(5, function()
   local skt = assert(socket.connect(host, port))
   finally(function() copas.close(skt) end)
   local data = copas.receive(skt)
@@ -66,7 +66,7 @@ Composes directly with Busted's own `assert.has_error` for "fails within N
 seconds" assertions — no dedicated helper needed:
 
 ```lua
-assert.has_error(cb.timeout(1, function()
+assert.has_error(bc.timeout(1, function()
   -- ... something that should error ...
 end))
 ```
@@ -89,11 +89,11 @@ in a `copas.future`) that errors independently goes to Copas's default error
 handler — it prints and vanishes, without failing the test. If a subtask's
 outcome matters to a test's correctness, the test should observe it
 explicitly: wrap it in its own `copas.future` and check the result, the same
-way `cb.timeout` observes its own future.
+way `bc.timeout` observes its own future.
 
 ## Limitations
 
-- **Coroutine abandonment**: a `cb.timeout` expiry stops the test's
+- **Coroutine abandonment**: a `bc.timeout` expiry stops the test's
   coroutine from ever being resumed again. It does not run any code after
   the point it was suspended, including inline cleanup that isn't behind a
   `finally()` registered earlier. This is fundamental to how Lua coroutines
@@ -108,4 +108,4 @@ way `cb.timeout` observes its own future.
   from this library.
 
 See the [echo server example](../examples/echo_server_spec.lua.html) for
-`cb.timeout` and `finally()` used together against real socket I/O.
+`bc.timeout` and `finally()` used together against real socket I/O.

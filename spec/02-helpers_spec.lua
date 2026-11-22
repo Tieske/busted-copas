@@ -1,4 +1,4 @@
-local cb     = require "busted-copas"
+local bc     = require "busted-copas"
 local copas  = require "copas"
 
 
@@ -11,14 +11,14 @@ describe("busted-copas.wait()", function()
       copas.pause(0.05)
       flag = true
     end)
-    cb.wait(function() return flag end, 2)
+    bc.wait(function() return flag end, 2)
     assert.is_true(flag)
   end)
 
 
   it("raises an error on timeout", function()
     assert.has_error(function()
-      cb.wait(function() return false end, 0.1, 0.02)
+      bc.wait(function() return false end, 0.1, 0.02)
     end)
   end)
 
@@ -36,13 +36,13 @@ describe("busted-copas.timeout()", function()
 
 
 
-  it("passes when fn completes in time", cb.timeout(2, function()
+  it("passes when fn completes in time", bc.timeout(2, function()
     copas.pause(0.05)
   end))
 
 
   it("raises an error when fn takes too long", function()
-    assert.has_error(cb.timeout(0.1, function()
+    assert.has_error(bc.timeout(0.1, function()
       copas.pause(1)
     end))
   end)
@@ -57,7 +57,7 @@ describe("busted-copas.timeout()", function()
   -- not an accident — there's no way to observe post-abandonment cleanup
   -- synchronously from within the test that triggered it.
   it("registers finally() before the call that ends up timing out", function()
-    assert.has_error(cb.timeout(0.1, function()
+    assert.has_error(bc.timeout(0.1, function()
       finally(function() cleaned_up = true end)
       copas.pause(1) -- this is what times out
     end))
@@ -75,7 +75,7 @@ end)
 describe("busted-copas.pause()", function()
 
   it("is an alias for copas.pause", function()
-    assert.equals(copas.pause, cb.pause)
+    assert.equals(copas.pause, bc.pause)
   end)
 
 end)
