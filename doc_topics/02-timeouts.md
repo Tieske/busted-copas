@@ -108,6 +108,14 @@ way `bc.timeout` observes its own future.
   thing to understand correctly.
 - **Stray background-thread errors aren't forwarded**: see "Subtasks manage
   their own errors" above.
+- **`bc.wait`'s deadline is best-effort, not exact**: each poll sleeps for
+  at most the remaining time before the deadline, but `copas.pause` can
+  wake up slightly later than requested (never earlier) depending on the
+  scheduler's own tick granularity. A condition that flips true in that
+  small overshoot window can still be accepted. This is inherent to any
+  cooperative scheduler built on `select`/`poll` and isn't fixable by
+  reordering checks — only how large the overshoot can be is bounded, and
+  it's now capped at one scheduler tick rather than a full poll `interval`.
 - **Busted's re-exec arg quoting**: on every currently released Busted
   version, arguments passed through the `lua`-interpreter re-exec are joined
   unescaped — a spec path containing a space or shell metacharacter can
