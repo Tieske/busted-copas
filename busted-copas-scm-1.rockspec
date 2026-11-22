@@ -24,7 +24,7 @@ description = {
 }
 
 dependencies = {
-  "lua >= 5.1, < 5.6",
+  "lua >= 5.2, < 5.6",
   "copas >= 4.12.0",
   "busted >= 2.3.0",
 }

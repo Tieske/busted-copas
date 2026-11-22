@@ -42,6 +42,13 @@ to make async Copas code testable.
 
 ## Compatibility
 
-- Lua 5.1 – 5.5, and LuaJIT
+- Lua 5.2 – 5.5
 - Copas >= 4.12.0
 - Busted >= 2.3.0
+
+Lua 5.1 and LuaJIT are not supported: Busted wraps every `it()` body in
+`xpcall` for per-test error isolation, and Lua 5.1-class VMs cannot yield a
+coroutine across that boundary — a test calling a yielding Copas primitive
+(`copas.pause`, `copas.receive`, etc.) directly would raise *"attempt to
+yield across C-call boundary"* every time. Lua 5.2 introduced yieldable
+`pcall`/`xpcall`, which is what makes this library's core premise hold.
