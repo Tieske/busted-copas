@@ -48,6 +48,21 @@ describe("busted-copas.timeout()", function()
   end)
 
 
+  it("propagates fn's own error, raised immediately", function()
+    assert.error_matches(bc.timeout(2, function()
+      error("boom")
+    end), "boom")
+  end)
+
+
+  it("propagates fn's own error, raised after a yield", function()
+    assert.error_matches(bc.timeout(2, function()
+      copas.pause(0.05)
+      error("boom")
+    end), "boom")
+  end)
+
+
   -- finally() only runs as part of busted's own teardown for the test that
   -- registered it, once that test's `it()` body returns — not synchronously
   -- while it's still running. So observing it needs two tests: this one
