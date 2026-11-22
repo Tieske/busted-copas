@@ -48,6 +48,17 @@ describe("busted-copas.timeout()", function()
   end)
 
 
+  it("never resumes fn past the point where it was abandoned", function()
+    local resumed = false
+    assert.has_error(bc.timeout(0.1, function()
+      copas.pause(1) -- this is what times out; nothing after it should run
+      resumed = true
+    end))
+    copas.pause(0.2) -- give a wrongly-still-scheduled coroutine a chance to run
+    assert.is_false(resumed)
+  end)
+
+
   it("propagates fn's own error, raised immediately", function()
     assert.error_matches(bc.timeout(2, function()
       error("boom")
